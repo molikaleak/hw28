@@ -1,0 +1,40 @@
+name: Continuous Deployment - Backend
+
+on:
+  registry_package:
+    types: [published]
+
+jobs:
+  deploy-to-render:
+    runs-on: ubuntu-latest
+    if: contains(github.event.registry_package.package_name, 'demo')
+    
+    steps:
+      - name: Check package details
+        run: |
+          echo "Package: ${{ github.event.registry_package.package_name }}"
+          echo "Version: ${{ github.event.registry_package.package_version }}"
+          echo "Repository: ${{ github.event.registry_package.repository.full_name }}"
+      
+      - name: Deploy to Render
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+          
+      - name: Verify deployment
+        run: |
+          echo "Deployment triggered for image: ${{ github.event.registry_package.package_name }}:${{ github.event.registry_package.package_version }}"
+          echo "The backend should now be updated on Render"
+          
+  deploy-to-railway:
+    runs-on: ubuntu-latest
+    if: false  # Set to true if using Railway instead of Render
+    
+    steps:
+      - name: Deploy to Railway
+        uses: railwayapp/action@v1.0.0
+        with:
+          service: backend
+          token: ${{ secrets.RAILWAY_TOKEN }}
+          environment: production

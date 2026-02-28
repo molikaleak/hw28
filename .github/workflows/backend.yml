@@ -1,4 +1,4 @@
-name: Build and Push Backend to GHCR
+name: Build, Push, and Deploy Backend
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/backend
+  IMAGE_NAME: ${{ github.repository_owner }}/demo
 
 jobs:
   build-and-push-image:
@@ -41,3 +41,25 @@ jobs:
       - name: Build and push with Jib
         run: ./mvnw -B compile jib:build
         working-directory: ./backend
+
+      - name: Build JAR for Dockerfile
+        run: ./mvnw -B clean package -DskipTests
+        working-directory: ./backend
+
+      - name: Verify Docker artifacts
+        run: |
+          ls -la target/
+          echo "JAR file built successfully"
+        working-directory: ./backend
+
+  deploy-to-render:
+    runs-on: ubuntu-latest
+    needs: build-and-push-image
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Deploy to Render
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
