@@ -1,8 +1,6 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
-  output: 'standalone',
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // output: 'export' <-- removed, this broke Vercel routing
 };
 
-export default nextConfig;
+module.exports = nextConfig;
