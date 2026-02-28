@@ -1,5 +1,5 @@
-# Use OpenJDK 17 as base image
-FROM openjdk:17-jdk-slim
+# Use Eclipse Temurin JRE 17 Alpine as base image (small, reliable, and widely available)
+FROM eclipse-temurin:17-jre-alpine
 
 # Set working directory
 WORKDIR /app
