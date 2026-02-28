@@ -55,6 +55,13 @@ This code must be in a Git repository hosted on GitHub to use GitHub Actions.
      - `DATABASE_USERNAME`: `your-db-user`
      - `DATABASE_PASSWORD`: `your-db-password`
      - `SERVER_PORT`: `8080` (Spring Boot default port)
+     
+4. **BONUS: Auto-Deploy to Render**:
+   - In your Render Web Service dashboard, go to **Settings**.
+   - Scroll down to **Deploy Hook** and copy the URL.
+   - Go to your GitHub repository -> **Settings** -> **Secrets and variables** -> **Actions**.
+   - Add a new secret named `RENDER_DEPLOY_HOOK` with the copied URL.
+   - Now, pushing to `main` will automatically build the image, push to GHCR, and trigger Render to redeploy!
 
 ## Endpoints
 

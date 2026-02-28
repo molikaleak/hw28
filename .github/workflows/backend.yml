@@ -42,6 +42,10 @@ jobs:
         run: ./mvnw -B compile jib:build
         working-directory: ./backend
 
+      - name: Trigger Render Deploy
+        if: github.ref == 'refs/heads/main'
+        run: curl -s ${{ secrets.RENDER_DEPLOY_HOOK }}
+
       - name: Build JAR for Dockerfile
         run: ./mvnw -B clean package -DskipTests
         working-directory: ./backend
