@@ -62,7 +62,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment:
       name: Production Backend
-      url: ${{ secrets.RENDER_URL }}
+      url: ${{ vars.RENDER_URL }}
     
     steps:
       - name: Deploy to Render
