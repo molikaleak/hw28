@@ -14,7 +14,7 @@ env:
   IMAGE_NAME: ${{ github.repository_owner }}/demo
 
 jobs:
-  build-and-push-image:
+  build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,42 +31,25 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Log in to the Container registry
+      - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push with Jib
-        run: ./mvnw -B compile jib:build
+      - name: Build and Push Docker Image with Jib
         working-directory: ./backend
+        run: |
+          ./mvnw -B compile jib:build \
+            -Dimage=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Trigger Render Deploy
         if: github.ref == 'refs/heads/main'
-        run: curl -s ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
 
-      - name: Build JAR for Dockerfile
-        run: ./mvnw -B clean package -DskipTests
-        working-directory: ./backend
-
-      - name: Verify Docker artifacts
+      - name: Show Deployment Info
         run: |
-          ls -la target/
-          echo "JAR file built successfully"
-        working-directory: ./backend
-
-  deploy-to-render:
-    runs-on: ubuntu-latest
-    needs: build-and-push-image
-    if: github.ref == 'refs/heads/main'
-    environment:
-      name: Production Backend
-      url: ${{ vars.RENDER_URL }}
-    
-    steps:
-      - name: Deploy to Render
-        uses: johnbeynon/render-deploy-action@v0.0.8
-        with:
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
-          api-key: ${{ secrets.RENDER_API_KEY }}
+          echo "Image pushed:"
+          echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          echo "Render deployment triggered."
