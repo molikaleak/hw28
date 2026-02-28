@@ -32,8 +32,8 @@ WORKDIR /app
 # Copy the built JAR from builder stage
 COPY --from=builder /app/target/demo.jar app.jar
 
-# Expose port 8080
-EXPOSE 8080
+# Expose the port that will be used (default 8080, but Render sets PORT=3000)
+EXPOSE 3000
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the application with PORT environment variable support
+ENTRYPOINT ["sh", "-c", "echo \"Using port: ${PORT:-8080}\" && java -Dserver.port=${PORT:-8080} -jar app.jar"]
