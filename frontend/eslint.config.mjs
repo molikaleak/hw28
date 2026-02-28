@@ -6,10 +6,7 @@ import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 
 export default defineConfig([
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
   {
-    files: ["**/*.{js,jsx,ts,tsx}"],
     ignores: [
       ".next/**",
       "node_modules/**",
@@ -18,6 +15,11 @@ export default defineConfig([
       "out/**",
       "*.config.*"
     ],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    files: ["**/*.{js,jsx,ts,tsx}"],
     plugins: {
       react,
       "react-hooks": reactHooks,
