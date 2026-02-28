@@ -10,6 +10,14 @@ export default defineConfig([
   ...tseslint.configs.recommended,
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
+    ignores: [
+      ".next/**",
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      "out/**",
+      "*.config.*"
+    ],
     plugins: {
       react,
       "react-hooks": reactHooks,
@@ -18,12 +26,21 @@ export default defineConfig([
       globals: {
         ...globals.browser,
         ...globals.node,
+        module: "readonly",
+        require: "readonly",
+        exports: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        process: "readonly",
       },
     },
     rules: {
       "react/react-in-jsx-scope": "off",
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+      "@typescript-eslint/ban-ts-comment": "warn",
     },
   },
 ]);
