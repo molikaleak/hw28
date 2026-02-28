@@ -34,22 +34,25 @@ jobs:
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push Docker Image with Jib
+      - name: Build & Push Image with Jib
         working-directory: ./backend
         run: |
           ./mvnw -B compile jib:build \
-            -Dimage=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            -Dimage=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -DimageTags=latest
 
       - name: Trigger Render Deploy
         if: github.ref == 'refs/heads/main'
         run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
 
-      - name: Show Deployment Info
+      - name: Deployment Summary
         run: |
           echo "Image pushed:"
           echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          echo "Commit tag:"
+          echo "${{ github.sha }}"
           echo "Render deployment triggered."
